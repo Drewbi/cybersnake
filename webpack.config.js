@@ -7,10 +7,10 @@ module.exports = {
   devtool: 'inline-source-map',
   entry: './src/app.js',
   devServer: {
-    contentBase: './dist'
+    contentBase: './build'
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'build'),
     filename: 'main.js'
   },
   plugins: [
