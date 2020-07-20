@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from './lib/orbitControl'
+import { LineGeometry} from './lib/LineGeometry'
+import {LineMaterial} from './lib/LineMaterial'
+import {Line2} from './lib/Line2'
 import './main.css'
 import Disc from './assets/disc.png'
 
 var renderer, scene, camera, controls;
 
-var particles;
+var particles,snakeyLine;
 
 var CUBE_SIZE = 50;
 var PARTICLE_DIMENSION = 10;
@@ -25,7 +28,7 @@ function init() {
   scene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-  camera.position.z = 250;
+  camera.position.z = 80;
   
   
   //
@@ -36,6 +39,7 @@ function init() {
     var vert = new THREE.PlaneGeometry( CUBE_SIZE, CUBE_SIZE, PARTICLE_DIMENSION, PARTICLE_DIMENSION ).applyMatrix4(transform).vertices;
     vertices.push(...vert)
   }
+  console.log(vertices)
 
   //
   var positions = new Float32Array( vertices.length * 3 );
@@ -95,26 +99,68 @@ function init() {
   particles = new THREE.Points( geometry, material );
   scene.add( particles );
 
-  // array of snake points
-  var snakeyPositions = new Float32Array(3);
-  var snakeyColors = new Float32Array(3);
-  var snakeySizes = new Float32Array(1);
+  // make a big dot
+  // var snakeyPositions = new Float32Array(3);
+  // var snakeyColors = new Float32Array(3);
+  // var snakeySizes = new Float32Array(1);
 
-  var dot = new THREE.Vector3(0,0,0);
-  dot.toArray(snakeyPositions, 0);
+  // var dot = new THREE.Vector3(0,0,0);
+  // dot.toArray(snakeyPositions, 0);
 
-  var dotColor = new THREE.Color(0x00ff00)
-  dotColor.toArray(snakeyColors,0)
+  // var dotColor = new THREE.Color(0x00ff00)
+  // dotColor.toArray(snakeyColors,0)
 
-  snakeySizes[0] = 5;
+  // snakeySizes[0] = 5;
 
-  var snakeyGeometry = new THREE.BufferGeometry();
-  snakeyGeometry.setAttribute('position', new THREE.BufferAttribute(snakeyPositions, 3));
-  snakeyGeometry.setAttribute('customColor', new THREE.BufferAttribute(snakeyColors, 3));
-  snakeyGeometry.setAttribute('size', new THREE.BufferAttribute(snakeySizes, 1));
+  // var snakeyGeometry = new THREE.BufferGeometry();
+  // snakeyGeometry.setAttribute('position', new THREE.BufferAttribute(snakeyPositions, 3));
+  // snakeyGeometry.setAttribute('customColor', new THREE.BufferAttribute(snakeyColors, 3));
+  // snakeyGeometry.setAttribute('size', new THREE.BufferAttribute(snakeySizes, 1));
 
-  var bigDot = new THREE.Points(snakeyGeometry, snakeyMaterial);
-  scene.add(bigDot);
+  // var bigDot = new THREE.Points(snakeyGeometry, snakeyMaterial);
+  // scene.add(bigDot);
+
+  //
+  // snakeyL ( LineGeometry, LineMaterial )
+
+  var snakeyPositions = []
+  
+  var snakeyPoint = vertices[Math.floor(Math.random() * vertices.length)] //chose a random point from the grid
+  var snakeyColor = new THREE.Color(0xff0000);
+
+  snakeyPositions.push(snakeyPoint.x,snakeyPoint.y,snakeyPoint.z)
+  snakeyPositions.push(snakeyPoint.x+5, snakeyPoint.y, snakeyPoint.z)
+  snakeyPositions.push(snakeyPoint.x + 10, snakeyPoint.y, snakeyPoint.z)
+
+  //for each point/position, push 3 separate colour val into colour array
+  var snakeyColours = new Array(snakeyPositions.length)
+  for(var i=0;i<snakeyPositions.length-1;i++){
+    snakeyColours.fill(snakeyColor.r, i * 3 )
+    snakeyColours.fill(snakeyColor.g, i * 3 + 1)
+    snakeyColours.fill(snakeyColor.b, i * 3 + 2)
+
+  }
+  console.log(snakeyColours)
+
+  var geometry = new LineGeometry();
+  geometry.setPositions(snakeyPositions);
+  geometry.setColors(snakeyColours);
+
+  var matLine = new LineMaterial({
+
+    color: 0xff0000,
+    linewidth: 0.02, // in pixels
+    vertexColors: true,
+    //resolution:  // to be set by renderer, eventually
+    dashed: false
+
+  });
+
+  snakeyLine = new Line2(geometry, matLine);
+  snakeyLine.computeLineDistances();
+  snakeyLine.scale.set(1, 1, 1);
+  scene.add(snakeyLine);
+
   //
 
   renderer = new THREE.WebGLRenderer();
@@ -128,6 +174,7 @@ function init() {
   controls.update();
   controls.enablePan = false;
   controls.enableDamping = true;
+  controls.enableZoom = false;
   //
 
   raycaster = new THREE.Raycaster();
@@ -142,8 +189,8 @@ function onDocumentMouseMove( event ) {
 
   event.preventDefault();
 
-  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  // mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  // mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 }
 
@@ -170,6 +217,9 @@ function render() {
 
   particles.rotation.x += 0.0005;
   particles.rotation.y += 0.001;
+
+  snakeyLine.rotation.x += 0.0005;
+  snakeyLine.rotation.y += 0.001;
 
   renderer.render( scene, camera );
 
