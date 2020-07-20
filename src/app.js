@@ -7,9 +7,9 @@ var renderer, scene, camera, controls;
 
 var particles;
 
-var CUBE_SIZE = 200;
-var PARTICLE_DIMENSION = 16;
-var PARTICLE_SIZE = 10;
+var CUBE_SIZE = 50;
+var PARTICLE_DIMENSION = 10;
+var PARTICLE_SIZE = 5;
 var TARGET_SIZE = 25;
 
 var raycaster, intersects;
@@ -43,17 +43,17 @@ function init() {
   var sizes = new Float32Array( vertices.length );
 
   var vertex;
-  var color = new THREE.Color();
+  var color = new THREE.Color(0xffffff);
 
   for ( var i = 0, l = vertices.length; i < l; i ++ ) {
 
     vertex = vertices[ i ];
     vertex.toArray( positions, i * 3 );
 
-    color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 );
+    // color.setHSL(1,1,1);
     color.toArray( colors, i * 3 );
 
-    sizes[ i ] = PARTICLE_SIZE * 0.5;
+    sizes[ i ] = PARTICLE_SIZE ;
 
   }
 
@@ -78,29 +78,43 @@ function init() {
   } );
 
   //
+  var snakeyMaterial = new THREE.ShaderMaterial({
+
+    uniforms: {
+      color: { value: new THREE.Color(0x00ff00) },
+      pointTexture: { value: new THREE.TextureLoader().load(Disc) }
+    },
+    vertexShader: document.getElementById('vertexshader').textContent,
+    fragmentShader: document.getElementById('fragmentshader').textContent,
+
+    alphaTest: 0.9
+
+  });
+  //
 
   particles = new THREE.Points( geometry, material );
   scene.add( particles );
-  
-  // Snake stuff
 
-  // var positions = []
-  // var point = new THREE.Vector3(0,0,0);
-  // var point1 = new THREE.Vector3(50, 50, 50);
-  // positions.push(point)
-  // position.push(point1)
-  // var geo = new THREE.BufferGeometry();
-  // geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  // geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  // array of snake points
+  var snakeyPositions = new Float32Array(3);
+  var snakeyColors = new Float32Array(3);
+  var snakeySizes = new Float32Array(1);
 
-  // matLineBasic = new THREE.LineBasicMaterial({ vertexColors: true });
-  // matLineDashed = new THREE.LineDashedMaterial({ vertexColors: true, scale: 2, dashSize: 1, gapSize: 1 });
+  var dot = new THREE.Vector3(0,0,0);
+  dot.toArray(snakeyPositions, 0);
 
-  // line1 = new THREE.Line(geo, matLineBasic);
-  // line1.computeLineDistances();
-  // line1.visible = false;
-  // scene.add(line1);
+  var dotColor = new THREE.Color(0x00ff00)
+  dotColor.toArray(snakeyColors,0)
 
+  snakeySizes[0] = 5;
+
+  var snakeyGeometry = new THREE.BufferGeometry();
+  snakeyGeometry.setAttribute('position', new THREE.BufferAttribute(snakeyPositions, 3));
+  snakeyGeometry.setAttribute('customColor', new THREE.BufferAttribute(snakeyColors, 3));
+  snakeyGeometry.setAttribute('size', new THREE.BufferAttribute(snakeySizes, 1));
+
+  var bigDot = new THREE.Points(snakeyGeometry, snakeyMaterial);
+  scene.add(bigDot);
   //
 
   renderer = new THREE.WebGLRenderer();
@@ -117,7 +131,7 @@ function init() {
   //
 
   raycaster = new THREE.Raycaster();
-  mouse = new THREE.Vector2();
+  // mouse = new THREE.Vector2();
 
   window.addEventListener( 'resize', onWindowResize, false );
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -156,34 +170,6 @@ function render() {
 
   particles.rotation.x += 0.0005;
   particles.rotation.y += 0.001;
-
-  var geometry = particles.geometry;
-  var attributes = geometry.attributes;
-
-  raycaster.setFromCamera( mouse, camera );
-
-  intersects = raycaster.intersectObject( particles );
-
-  if ( intersects.length > 0 ) {
-
-    if ( INTERSECTED != intersects[ 0 ].index ) {
-
-      attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE;
-
-      INTERSECTED = intersects[ 0 ].index;
-
-      attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE * 1.25;
-      attributes.size.needsUpdate = true;
-
-    }
-
-  } else if ( INTERSECTED !== null ) {
-
-    attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE;
-    attributes.size.needsUpdate = true;
-    INTERSECTED = null;
-
-  }
 
   renderer.render( scene, camera );
 
