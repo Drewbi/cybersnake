@@ -50,7 +50,7 @@ function init() {
     vertex = vertices[ i ];
     vertex.toArray( positions, i * 3 );
 
-    color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 );
+    color.setHSL( 0.45 + 0.1 * ( i / l ), 1.0, 0.5 );
     color.toArray( colors, i * 3 );
 
     sizes[ i ] = PARTICLE_SIZE * 0.5;
