@@ -1,4 +1,4 @@
-## CyberSnake
+## [CyberSnake](https://drewbi.github.io/cybersnake/)
 ![CD](https://github.com/Drewbi/cybersnake/workflows/CD/badge.svg)
 > Snake in the 3rd dimension
 
