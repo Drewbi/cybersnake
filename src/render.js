@@ -1,3 +1,6 @@
+import { renderGame } from "./helper/gameRenderer"
+import { state } from './helper/gameLogic'
+
 const animate = (world) => () => {
   requestAnimationFrame( animate(world) );
   const {
@@ -5,13 +8,12 @@ const animate = (world) => () => {
     scene,
     camera,
     controls,
-    particles
+    validPositions,
+    snake
   } = world;
 
+  renderGame(snake, state, validPositions)
   controls.update();
-
-  particles.rotation.x += 0.0001;
-  particles.rotation.y += 0.001;
 
   renderer.render( scene, camera );
 

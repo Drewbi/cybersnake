@@ -1,0 +1,6 @@
+export default {
+  CUBE_SIZE: 100,
+  PARTICLE_DIMENSION: 8,
+  PARTICLE_SIZE: 10,
+  TARGET_SIZE: 25,
+}

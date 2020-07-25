@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from './lib/orbitControl'
 import Disc from './assets/disc.png'
+import {Line2} from './lib/Line2'
+import {LineGeometry} from './lib/LineGeometry'
+import {LineMaterial} from './lib/LineMaterial'
 
 const init = (config) => {
 
@@ -21,12 +24,31 @@ const init = (config) => {
   //
 
   const vertices = []
+  const vertpos = []
   for (let i = 0; i < PARTICLE_DIMENSION; i++) {
     const translateAmount = (CUBE_SIZE / PARTICLE_DIMENSION ) * i
     const transform = new THREE.Matrix4().makeTranslation(0, 0, translateAmount - CUBE_SIZE / 2 );
-    const vert = new THREE.PlaneGeometry( CUBE_SIZE, CUBE_SIZE, PARTICLE_DIMENSION, PARTICLE_DIMENSION ).applyMatrix4(transform).vertices;
+    const vert = new THREE.PlaneGeometry( CUBE_SIZE, CUBE_SIZE, PARTICLE_DIMENSION - 1, PARTICLE_DIMENSION - 1 ).applyMatrix4(transform).vertices;
     vertices.push(...vert)
+    vertpos.push([])
+    for (let j = 0; j < PARTICLE_DIMENSION; j++) {
+        vertpos[i].push(vert.slice(j * PARTICLE_DIMENSION, j * PARTICLE_DIMENSION + PARTICLE_DIMENSION))    
+    }
   }
+  
+  // const validPositions = []
+  // const delim = CUBE_SIZE / PARTICLE_DIMENSION;
+  // for (let i = 0; i < PARTICLE_DIMENSION; i++) {
+  //   let x = delim * i
+  //   validPositions.push([])
+  //   for (let j = 0; j < PARTICLE_DIMENSION; j++) {
+  //     let y = delim * j
+  //     validPositions[i].push([])
+  //     for (let k = 0; k < PARTICLE_DIMENSION; k++) {
+  //       validPositions[i][j].push({ x, y, z: delim * k})
+  //     }
+  //   }
+  // }
 
   //
   const positions = new Float32Array( vertices.length * 3 );
@@ -70,7 +92,46 @@ const init = (config) => {
   const particles = new THREE.Points( geometry, material );
   scene.add( particles );
 
-  //
+  //========== snake body start here
+
+  
+
+  var snakeyPositions = [] //store all the snake body location
+  var snakeyPoint = vertpos[4][4][4];
+  var snakeyColor = new THREE.Color(0x55ffaa);
+
+  snakeyPositions.push(snakeyPoint.x, snakeyPoint.y, snakeyPoint.z)
+  snakeyPositions.push(snakeyPoint.x, snakeyPoint.y, snakeyPoint.z)
+  // snakeyPositions.push(snakeyPoint.x + CUBE_SIZE/PARTICLE_DIMENSION, snakeyPoint.y, snakeyPoint.z)
+  // snakeyPositions.push(snakeyPoint.x + (2*CUBE_SIZE)/PARTICLE_DIMENSION, snakeyPoint.y, snakeyPoint.z)
+  //for each point/position, push 3 separate colour val into colour array
+  var snakeyColours = new Array(snakeyPositions.length)
+  for(var i=0;i<snakeyPositions.length-1;i++){
+    snakeyColours.fill(snakeyColor.r, i * 3 )
+    snakeyColours.fill(snakeyColor.g, i * 3 + 1)
+    snakeyColours.fill(snakeyColor.b, i * 3 + 2)
+  }
+
+  var lineGeometry = new LineGeometry();//marry location & colours into geometry object
+  lineGeometry.setPositions(snakeyPositions);
+  lineGeometry.setColors(snakeyColours);
+
+  //buffer geometry
+  const MAX_LEN = vertices.length;
+
+  var matLine = new LineMaterial({
+    color: 0xffffff,
+    linewidth: 0.02, // in pixels
+    vertexColors: true,
+    dashed: false
+  });
+
+  var snake = new Line2(lineGeometry, matLine);
+  snake.computeLineDistances();
+  snake.scale.set(1, 1, 1);
+  scene.add(snake);
+
+  // ========== snake body ends here
 
   const renderer = new THREE.WebGLRenderer();
   renderer.setPixelRatio( window.devicePixelRatio );
@@ -93,7 +154,7 @@ const init = (config) => {
 
   window.addEventListener( 'resize', onWindowResize, false );
 
-  return { renderer, scene, camera, controls, particles }
+  return { renderer, scene, camera, controls, vertpos, snake }
 }
 
 export { init };
