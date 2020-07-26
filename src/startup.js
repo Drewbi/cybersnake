@@ -141,6 +141,7 @@ const init = (config) => {
   var lineGeometry = new LineGeometry();//marry location & colours into geometry object
   lineGeometry.setPositions(snakeyPositions);
   lineGeometry.setColors(snakeyColours);
+  console.log(snakeyPositions)
 
   var matLine = new LineMaterial({
     color: 0xffffff,
@@ -149,10 +150,30 @@ const init = (config) => {
     dashed: false
   });
 
-  var snake = new Line2(lineGeometry, matLine);
-  snake.computeLineDistances();
-  snake.scale.set(1, 1, 1);
+  var snakebody = new Line2(lineGeometry, matLine);
+  snakebody.computeLineDistances();
+  snakebody.scale.set(1, 1, 1);
+
+  var eyeballgeometry = new THREE.SphereGeometry(1.5, 32, 32);
+  var eyeballmaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  var eyeball = new THREE.Mesh(eyeballgeometry, eyeballmaterial);
+  eyeball.position.set(1.5,0,0);
+  var eyegeometry = new THREE.SphereGeometry(1, 32, 32);
+  var eyematerial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+  var eye = new THREE.Mesh(eyegeometry, eyematerial);
+  eye.position.set(1.5, 0, 0.6)
+
+  var eyes = new THREE.Group();
+  eyes.add(eye);
+  eyes.add(eyeball);
+  eyes.add(eye.clone().translateX(-2.5));
+  eyes.add(eyeball.clone().translateX(-2.5));
+
+  var snake = new THREE.Group();//snake is a group consists of snake body(type line2) and snake eyes(type group)
+  snake.add(snakebody);
+  snake.add(eyes);
   scene.add(snake);
+  console.log(snake);
 
   // ========== snake body ends here
 
