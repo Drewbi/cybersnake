@@ -15,6 +15,7 @@ const init = (config) => {
   } = config;
 
   const container = document.getElementById( 'container' );
+  const gameInfo = document.getElementById( 'gameText' );
 
   const scene = new THREE.Scene();
 
@@ -62,13 +63,16 @@ const init = (config) => {
 
     vertex = vertices[ i ];
     vertex.toArray( positions, i * 3 );
-
     color.setHSL( 0.45 + 0.1 * ( i / l ), 1.0, 0.5 );
     color.toArray( colors, i * 3 );
 
     sizes[ i ] = PARTICLE_SIZE * 0.5;
 
   }
+  console.log(positions);
+  console.log(colors);
+  console.log(sizes);
+
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
@@ -91,6 +95,34 @@ const init = (config) => {
 
   const particles = new THREE.Points( geometry, material );
   scene.add( particles );
+
+  //========== target
+
+  const targetPosition = new Float32Array( 3 );
+  const targetColor = new Float32Array( 3 );
+  const targetSize = new Float32Array( 1 );
+
+  targetSize[0] = TARGET_SIZE;
+
+  targetColor[0] = 0.9
+  targetColor[1] = 0.6
+  targetColor[2] = 0.6
+
+  targetPosition[0] = 0;
+  targetPosition[1] = 0;
+  targetPosition[2] = 0;
+  console.log(targetPosition);
+  console.log(targetColor);
+  console.log(targetSize);
+
+
+  const targetGeometry = new THREE.BufferGeometry();
+  targetGeometry.setAttribute( 'position', new THREE.BufferAttribute( targetPosition, 3 ) );
+  targetGeometry.setAttribute( 'customColor', new THREE.BufferAttribute( targetColor, 3 ) );
+  targetGeometry.setAttribute( 'size', new THREE.BufferAttribute( targetSize, 1 ) );
+
+  const target = new THREE.Points( targetGeometry, material );
+  scene.add( target );
 
   //========== snake body start here
 
@@ -115,9 +147,6 @@ const init = (config) => {
   var lineGeometry = new LineGeometry();//marry location & colours into geometry object
   lineGeometry.setPositions(snakeyPositions);
   lineGeometry.setColors(snakeyColours);
-
-  //buffer geometry
-  const MAX_LEN = vertices.length;
 
   var matLine = new LineMaterial({
     color: 0xffffff,
@@ -154,7 +183,7 @@ const init = (config) => {
 
   window.addEventListener( 'resize', onWindowResize, false );
 
-  return { renderer, scene, camera, controls, vertpos, snake }
+  return { renderer, scene, camera, controls, vertpos, snake, target, gameInfo }
 }
 
 export { init };

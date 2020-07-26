@@ -47,41 +47,50 @@ const snakeEatFood = (oldTail, arraySnakeBody) => arraySnakeBody.push(oldTail)
 // CHECK SNAKE EAT IT SELF
 const didSnakeEatSelf = (snakeBody) => {
     const set = new Set(snakeBody)
-    return set.length() !== snakeBody.length()
+    return set.size !== snakeBody.length
 }
 
 // CHECK SNAKE HIT BOUNDARY
 const didSnakeHitBoundary = (snakeBody) => {
     const head = snakeBody[0]
-    return head.every((headElement) => 0<=headElement && headElement<CUBE_SIZE)
+    console.log(head);
+    return !head.every((headElement) => 0 <= headElement && headElement < PARTICLE_DIMENSION)
 }
 
 // GAME STATE
-const state = {
-    body: [[0, 0, 0], [0, 1, 0]],
-    oldTail: [0, 2, 0],
-    foodLocation: [1, 1, 0],
-    movementVector: [1, 0, 0],
-    upVector: [0, 1, 0],
-    score: 0
+let state = {}
+
+const startGame = () => {
+    if(state.playing === -1) initState()
+    state.playing = 1;
+}
+
+const initState = () => {
+    state = {
+        body: [[4, 4, 4], [5, 4, 4], [6, 4, 4]],
+        oldTail: [6, 4, 4],
+        foodLocation: [1, 1, 0],
+        movementVector: [1, 0, 0],
+        upVector: [0, 1, 0],
+        score: 0,
+        playing: 0
+    }
 }
 
 // MANIPULATES THE STATE - returns TRUE if valid, or FALSE for game over
 const gameStateChanger = () => {
-    console.log('Tick')
-    // state.oldTail = moveSnake(state.body, state.movementVector)
+    console.log(state.playing)
+    if (state.playing !== 1) return
+    state.oldTail = moveSnake(state.body, state.movementVector)
 
-    // if (canSnakeEatFood(state.foodLocation, state.body)) {
-    //     snakeEatFood(state.oldTail, state.body)
-    //     state.score +=10
-    //     state.foodLocation = randomLocationOfFood(state.body)
-    //     return true
-    // }
-    // else if(didSnakeEatSelf(state.body) || didSnakeHitBoundary(state.body)){
-    //     return false
-    // }
-    // return true
-
+    if (canSnakeEatFood(state.foodLocation, state.body)) {
+        snakeEatFood(state.oldTail, state.body)
+        state.score += 10
+        state.foodLocation = randomLocationOfFood(state.body)
+    }
+    else if(didSnakeEatSelf(state.body) || didSnakeHitBoundary(state.body)){
+        state.playing = -1
+    }
 }
 
-export { gameStateChanger, state };
+export { gameStateChanger, state, initState, startGame };

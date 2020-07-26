@@ -1,4 +1,4 @@
-import { state } from './gameLogic'
+import { state, startGame, initState } from './gameLogic'
 
 const setInput = (value) => {
   console.log(value);
@@ -30,6 +30,12 @@ const bindInput = () => {
     }
     else if(event.keyCode == 40 || event.keyCode == 83) {
       setInput([0, -1]);
+    }
+    else if(event.keyCode == 32 || event.keyCode == 13) {
+      startGame();
+    }
+    else if(event.keyCode == 46 || event.keyCode == 27 || event.keyCode == 8) {
+      initState()
     }
   });
 }
