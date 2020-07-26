@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import { OrbitControls } from './lib/orbitControl'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Disc from './assets/disc.png'
-import {Line2} from './lib/Line2'
-import {LineGeometry} from './lib/LineGeometry'
-import {LineMaterial} from './lib/LineMaterial'
+import { Line2 } from 'three/examples/jsm/lines/Line2'
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry'
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial'
 
 const init = (config) => {
 
@@ -69,10 +69,6 @@ const init = (config) => {
     sizes[ i ] = PARTICLE_SIZE * 0.5;
 
   }
-  console.log(positions);
-  console.log(colors);
-  console.log(sizes);
-
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
@@ -111,10 +107,6 @@ const init = (config) => {
   targetPosition[0] = 0;
   targetPosition[1] = 0;
   targetPosition[2] = 0;
-  console.log(targetPosition);
-  console.log(targetColor);
-  console.log(targetSize);
-
 
   const targetGeometry = new THREE.BufferGeometry();
   targetGeometry.setAttribute( 'position', new THREE.BufferAttribute( targetPosition, 3 ) );
@@ -134,15 +126,17 @@ const init = (config) => {
 
   snakeyPositions.push(snakeyPoint.x, snakeyPoint.y, snakeyPoint.z)
   snakeyPositions.push(snakeyPoint.x, snakeyPoint.y, snakeyPoint.z)
+  snakeyPositions.push(snakeyPoint.x, snakeyPoint.y, snakeyPoint.z)
   // snakeyPositions.push(snakeyPoint.x + CUBE_SIZE/PARTICLE_DIMENSION, snakeyPoint.y, snakeyPoint.z)
   // snakeyPositions.push(snakeyPoint.x + (2*CUBE_SIZE)/PARTICLE_DIMENSION, snakeyPoint.y, snakeyPoint.z)
   //for each point/position, push 3 separate colour val into colour array
   var snakeyColours = new Array(snakeyPositions.length)
-  for(var i=0;i<snakeyPositions.length-1;i++){
+  for(var i = 0; i < snakeyPositions.length; i++){
     snakeyColours.fill(snakeyColor.r, i * 3 )
     snakeyColours.fill(snakeyColor.g, i * 3 + 1)
     snakeyColours.fill(snakeyColor.b, i * 3 + 2)
   }
+  console.log(snakeyColours)
 
   var lineGeometry = new LineGeometry();//marry location & colours into geometry object
   lineGeometry.setPositions(snakeyPositions);

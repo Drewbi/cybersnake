@@ -1,20 +1,25 @@
 import { state, startGame, initState } from './gameLogic'
+import * as THREE from 'three';
 
 const setInput = (value) => {
-  console.log(value);
-  console.log(state.movementVector)
-  // Input is left/right
-  if(value[0] === 1) {
-    state.movementVector[0] = state.movementVector[2] === 1 ? -1 : state.movementVector[2] === -1 ? 1 : 0;
-    state.movementVector[1] = 0;
-    state.movementVector[2] = state.movementVector[1] === 1 ? 1 : state.movementVector[1] === -1 ? -1 : 0;
+  const quaternion = new THREE.Quaternion();
+  
+  // Input is right/left
+  if(value[0] !== 0) {
+    quaternion.setFromAxisAngle( state.upVector, value[0] * Math.PI / 2 );
+    state.movementVector.applyQuaternion( quaternion );
+    state.movementVector.floor()
   // Input is up/down
   } else if(value[1] !== 0) {
-    state.movementVector[0] = 0;
-    state.movementVector[1] = 0;
-    state.movementVector[2] = 0;
+    const cross = new THREE.Vector3().crossVectors(state.movementVector, state.upVector)
+    state.upVector = state.movementVector.clone().negate()
+    state.upVector.floor()
+    console.log(state.movementVector);
+    console.log(state.upVector);
+    quaternion.setFromAxisAngle( cross, (-1 * value[1]) * Math.PI / 2 );
+    state.movementVector.applyQuaternion( quaternion );
+    state.movementVector.floor()
   }
-  state.movementVector
 }
 
 const bindInput = () => {
