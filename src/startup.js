@@ -118,8 +118,6 @@ const init = (config) => {
 
   //========== snake body start here
 
-  
-
   var snakeyPositions = [] //store all the snake body location
   var snakeyPoint = vertpos[4][4][4];
   var snakeyColor = new THREE.Color(0x55ffaa);
@@ -136,7 +134,6 @@ const init = (config) => {
     snakeyColours.fill(snakeyColor.g, i * 3 + 1)
     snakeyColours.fill(snakeyColor.b, i * 3 + 2)
   }
-  console.log(snakeyColours)
 
   var lineGeometry = new LineGeometry();//marry location & colours into geometry object
   lineGeometry.setPositions(snakeyPositions);
@@ -153,6 +150,8 @@ const init = (config) => {
   snake.computeLineDistances();
   snake.scale.set(1, 1, 1);
   scene.add(snake);
+
+  console.log(snake);
 
   // ========== snake body ends here
 

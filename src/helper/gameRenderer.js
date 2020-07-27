@@ -25,7 +25,6 @@ const renderGame = (snake, target, state, vertices) => {
     const pos = vertices[indices.x][indices.y][indices.z]
     newPos.push(pos.x, pos.y, pos.z)
   }
-  console.log(newPos);
   snake.geometry.setPositions(newPos)
   snake.geometry.verticesNeedUpdate = true;
   needsUpdate = false
