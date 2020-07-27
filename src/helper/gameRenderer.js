@@ -25,8 +25,12 @@ const renderGame = (snake, target, state, vertices) => {
     const pos = vertices[indices.x][indices.y][indices.z]
     newPos.push(pos.x, pos.y, pos.z)
   }
-  snake.geometry.setPositions(newPos)
-  snake.geometry.verticesNeedUpdate = true;
+  console.log(newPos);
+  //snake.children[0] is the snake body
+  snake.children[0].geometry.setPositions(newPos)
+  snake.children[0].geometry.verticesNeedUpdate = true;
+  //snake.children[1] is the snake eyes
+  snake.children[1].position.set(newPos[0],newPos[1],newPos[2]) 
   needsUpdate = false
 }
 
