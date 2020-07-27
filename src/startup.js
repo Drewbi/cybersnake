@@ -1,11 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Disc from './assets/disc.png'
-import { Line2 } from 'three/examples/jsm/lines/Line2'
-import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry'
-import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial'
+import { makeSnakeBody, makeSnakeEyes } from './helper/snake'
+import config from './config'
 
-const init = (config) => {
+const init = () => {
 
   const  {
     CUBE_SIZE,
@@ -14,15 +13,12 @@ const init = (config) => {
     TARGET_SIZE,
   } = config;
 
-  const container = document.getElementById( 'container' );
-  const gameInfo = document.getElementById( 'gameText' );
-
   const scene = new THREE.Scene();
 
   const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
   camera.position.z = 250;
   
-  //
+  // ============ Make Cube
 
   const vertices = []
   const vertpos = []
@@ -36,20 +32,6 @@ const init = (config) => {
         vertpos[i].push(vert.slice(j * PARTICLE_DIMENSION, j * PARTICLE_DIMENSION + PARTICLE_DIMENSION))    
     }
   }
-  
-  // const validPositions = []
-  // const delim = CUBE_SIZE / PARTICLE_DIMENSION;
-  // for (let i = 0; i < PARTICLE_DIMENSION; i++) {
-  //   let x = delim * i
-  //   validPositions.push([])
-  //   for (let j = 0; j < PARTICLE_DIMENSION; j++) {
-  //     let y = delim * j
-  //     validPositions[i].push([])
-  //     for (let k = 0; k < PARTICLE_DIMENSION; k++) {
-  //       validPositions[i][j].push({ x, y, z: delim * k})
-  //     }
-  //   }
-  // }
 
   //
   const positions = new Float32Array( vertices.length * 3 );
@@ -116,74 +98,31 @@ const init = (config) => {
   const target = new THREE.Points( targetGeometry, material );
   scene.add( target );
 
-  //========== snake body start here
+  // Make Snake ---------------------
 
-  var snakeyPositions = [] //store all the snake body location
-  var snakeyPoint = vertpos[4][4][4];
-  var snakeyColor = new THREE.Color(0x55ffaa);
-
-  snakeyPositions.push(snakeyPoint.x, snakeyPoint.y, snakeyPoint.z)
-  snakeyPositions.push(snakeyPoint.x, snakeyPoint.y, snakeyPoint.z)
-  snakeyPositions.push(snakeyPoint.x, snakeyPoint.y, snakeyPoint.z)
-  // snakeyPositions.push(snakeyPoint.x + CUBE_SIZE/PARTICLE_DIMENSION, snakeyPoint.y, snakeyPoint.z)
-  // snakeyPositions.push(snakeyPoint.x + (2*CUBE_SIZE)/PARTICLE_DIMENSION, snakeyPoint.y, snakeyPoint.z)
-  //for each point/position, push 3 separate colour val into colour array
-  var snakeyColours = new Array(snakeyPositions.length)
-  for(var i = 0; i < snakeyPositions.length; i++){
-    snakeyColours.fill(snakeyColor.r, i * 3 )
-    snakeyColours.fill(snakeyColor.g, i * 3 + 1)
-    snakeyColours.fill(snakeyColor.b, i * 3 + 2)
-  }
-
-  var lineGeometry = new LineGeometry();//marry location & colours into geometry object
-  lineGeometry.setPositions(snakeyPositions);
-  lineGeometry.setColors(snakeyColours);
-
-  var matLine = new LineMaterial({
-    color: 0xffffff,
-    linewidth: 0.02, // in pixels
-    vertexColors: true,
-    dashed: false
-  });
-
-  var snakebody = new Line2(lineGeometry, matLine);
-  snakebody.computeLineDistances();
-  snakebody.scale.set(1, 1, 1);
-
-  var eyeballgeometry = new THREE.SphereGeometry(1.5, 32, 32);
-  var eyeballmaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  var eyeball = new THREE.Mesh(eyeballgeometry, eyeballmaterial);
-  eyeball.position.set(1.5,0,0);
-  var eyegeometry = new THREE.SphereGeometry(1, 32, 32);
-  var eyematerial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-  var eye = new THREE.Mesh(eyegeometry, eyematerial);
-  eye.position.set(1.5, 0, 0.6)
-
-  var eyes = new THREE.Group();
-  eyes.add(eye);
-  eyes.add(eyeball);
-  eyes.add(eye.clone().translateX(-2.5));
-  eyes.add(eyeball.clone().translateX(-2.5));
-
-  var snake = new THREE.Group();//snake is a group consists of snake body(type line2) and snake eyes(type group)
-  snake.add(snakebody);
-  snake.add(eyes);
+  const snake = new THREE.Group();
+  snake.add(makeSnakeBody(vertpos));
+  snake.add(makeSnakeEyes());
   scene.add(snake);
 
-  // ========== snake body ends here
+  // Renderer init -------------------
 
   const renderer = new THREE.WebGLRenderer();
   renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setSize( window.innerWidth, window.innerHeight );
+
+  const container = document.getElementById( 'container' );
   container.appendChild( renderer.domElement );
 
-  //
+  // Controls init --------------------
+
   const controls = new OrbitControls( camera, renderer.domElement );
   controls.target.set( 0, 0.5, 0 );
   controls.update();
   controls.enablePan = false;
   controls.enableDamping = true;
-  //
+
+  // Resize window ----------------------
 
   const onWindowResize = () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -192,6 +131,7 @@ const init = (config) => {
   }
 
   window.addEventListener( 'resize', onWindowResize, false );
+  const gameInfo = document.getElementById( 'gameText' );
 
   return { renderer, scene, camera, controls, vertpos, snake, target, gameInfo }
 }

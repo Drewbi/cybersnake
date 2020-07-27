@@ -1,9 +1,14 @@
 import * as THREE from 'three';
 import { updateSnake } from './gameRenderer'
+import { inputInput } from './input'
 
 import config from '../config'
 const {
-    PARTICLE_DIMENSION
+    PARTICLE_DIMENSION,
+    START_SPEED,
+    MAX_SPEED,
+    SPEED_RAMP,
+    TARGET_SCORE
 } = config
 
 // move snake by an interval (reference movement) and returns the oldTail by modifying the head, and
@@ -17,17 +22,16 @@ const moveSnake = (snakeBody, movementVector) => {
     return oldTail
 }
 
-// returns random (x,y,z) coordinate of a food that does not belong in the occupancy of the snake, adds to the previous position
+// returns random (x,y,z) coordinate of a food that does not belong in the occupancy of the snake
 const randomLocationOfFood = (snakeBody) => {
     const notValidLocation = snakeBody
 
-    const checkPointIsInalid = (point, invalid) => invalid.some(hayElement => point.equals(hayElement))
+    const checkPointIsInvalid = (point, invalid) => invalid.some(hayElement => point.equals(hayElement))
     const generateRandomPoint = () => Math.floor(Math.random() * PARTICLE_DIMENSION)
-    //RANDOMLY GENERATE THE LOCATION OF FOOD
     let randomLocation;
     do{
-        randomLocation = new THREE.Vector3(generateRandomPoint, generateRandomPoint, generateRandomPoint);
-    } while(!checkPointIsInalid(randomLocation, notValidLocation))
+        randomLocation = new THREE.Vector3(generateRandomPoint(), generateRandomPoint(), generateRandomPoint());
+    } while(checkPointIsInvalid(randomLocation, notValidLocation))
 
     return randomLocation
 }
@@ -57,43 +61,58 @@ let state = {}
 const startGame = () => {
     if(state.playing === -1) initState()
     state.playing = 1;
+    playGame()
+}
+
+const goFaster = () => {
+    state.tickTime -= SPEED_RAMP
 }
 
 const initState = () => {
     state = {
         body: [],
         oldTail: {},
-        foodLocation: new THREE.Vector3( 1, 1, 0 ),
+        foodLocation: new THREE.Vector3( 4, 4, 4 ),
         movementVector: new THREE.Vector3( 1, 0, 0 ),
         upVector: new THREE.Vector3( 0, 1, 0 ),
         score: 0,
+        tickTime: START_SPEED,
         playing: 0
     }
-    const head = new THREE.Vector3( 3, 4, 4 );
-    const bodyLength = 3;
-    for (let i = bodyLength - 1; i >= 0; i--) {
-        state.body.push(head.clone().add(new THREE.Vector3( i, 0, 0 )))   
+    const head = new THREE.Vector3( 0, 4, 4 );
+    const bodyLength = Math.pow(PARTICLE_DIMENSION, 3);
+    for (let i = bodyLength; i >= 0; i--) {
+        state.body.push(head.clone().add(new THREE.Vector3( 1, 0, 0 )))   
     }
     state.oldTail = state.body[bodyLength - 1]
 }
 
-// MANIPULATES THE STATE - returns TRUE if valid, or FALSE for game over
 const gameStateChanger = () => {
-    if (state.playing !== 1) return
     if(willSnakeHitBoundary(state.body, state.movementVector)){
         state.playing = -1
+        return false
     } else {
         state.oldTail = moveSnake(state.body, state.movementVector)
     }
     if (canSnakeEatFood(state.foodLocation, state.body)) {
         snakeEatFood(state.oldTail, state.body)
-        state.score += 10
+        state.score += TARGET_SCORE
+        state.tickTime -= state.tickTime > MAX_SPEED ? SPEED_RAMP : 0
         state.foodLocation = randomLocationOfFood(state.body)
     }
-    else if(didSnakeEatSelf(state.body)){
-        state.playing = -1
-    }
     updateSnake()
+    if(didSnakeEatSelf(state.body)){
+        state.playing = -1
+        return false
+    }
+    return true
 }
 
-export { gameStateChanger, state, initState, startGame };
+const playGame = () => {
+    if (state.playing !== 1) return
+    inputInput()
+    const alive = gameStateChanger()
+    if (alive) setTimeout(playGame, state.tickTime)
+}
+
+export { playGame, gameStateChanger, state, initState, startGame, goFaster };
