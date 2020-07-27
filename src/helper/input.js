@@ -17,6 +17,7 @@ const setInput = (value) => {
     state.movementVector.applyQuaternion( quaternion );
     state.movementVector.round()
   }
+  if (state.movementVector.y === 0) state.upVector.set(0, 1, 0) // Flips snake on his tummy
 }
 
 const bindInput = () => {

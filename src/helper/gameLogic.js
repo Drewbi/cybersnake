@@ -62,7 +62,7 @@ const startGame = () => {
 const initState = () => {
     state = {
         body: [],
-        oldTail: new THREE.Vector3( 6, 4, 4 ),
+        oldTail: {},
         foodLocation: new THREE.Vector3( 1, 1, 0 ),
         movementVector: new THREE.Vector3( 1, 0, 0 ),
         upVector: new THREE.Vector3( 0, 1, 0 ),
@@ -74,6 +74,7 @@ const initState = () => {
     for (let i = bodyLength - 1; i >= 0; i--) {
         state.body.push(head.clone().add(new THREE.Vector3( i, 0, 0 )))   
     }
+    state.oldTail = state.body[bodyLength - 1]
 }
 
 // MANIPULATES THE STATE - returns TRUE if valid, or FALSE for game over

@@ -138,7 +138,6 @@ const init = (config) => {
   var lineGeometry = new LineGeometry();//marry location & colours into geometry object
   lineGeometry.setPositions(snakeyPositions);
   lineGeometry.setColors(snakeyColours);
-  console.log(snakeyPositions)
 
   var matLine = new LineMaterial({
     color: 0xffffff,
@@ -170,9 +169,6 @@ const init = (config) => {
   snake.add(snakebody);
   snake.add(eyes);
   scene.add(snake);
-  console.log(snake);
-
-  console.log(snake);
 
   // ========== snake body ends here
 
