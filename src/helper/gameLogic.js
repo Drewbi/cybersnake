@@ -1,10 +1,9 @@
-const NUMBER_OF_DIMENSIONS = 3 // Will always be 3
 import * as THREE from 'three';
 import { updateSnake } from './gameRenderer'
 
 import config from '../config'
 const {
-    PARTICLE_DIMENSION, CUBE_SIZE
+    PARTICLE_DIMENSION
 } = config
 
 // move snake by an interval (reference movement) and returns the oldTail by modifying the head, and
@@ -22,14 +21,13 @@ const moveSnake = (snakeBody, movementVector) => {
 const randomLocationOfFood = (snakeBody) => {
     const notValidLocation = snakeBody
 
-    // FINDING NEEDLE IN A HAY
-    const checkArrayInArray = (needleArray,hayArray) => hayArray.some(hayElement => needleArray.every((needleElement,index)=>needleElement===hayElement[index]))
-
+    const checkPointIsInalid = (point, invalid) => invalid.some(hayElement => point.equals(hayElement))
+    const generateRandomPoint = () => Math.floor(Math.random() * PARTICLE_DIMENSION)
     //RANDOMLY GENERATE THE LOCATION OF FOOD
     let randomLocation;
     do{
-        randomLocation = Array.from({length: PARTICLE_DIMENSION}, () => Math.floor(Math.random() * PARTICLE_DIMENSION));
-    } while(!checkArrayInArray(randomLocation,notValidLocation))
+        randomLocation = new THREE.Vector3(generateRandomPoint, generateRandomPoint, generateRandomPoint);
+    } while(!checkPointIsInalid(randomLocation, notValidLocation))
 
     return randomLocation
 }
@@ -42,8 +40,8 @@ const snakeEatFood = (oldTail, snakeBody) => snakeBody.push(oldTail)
 
 // CHECK SNAKE EAT IT SELF
 const didSnakeEatSelf = (snakeBody) => {
-    const set = new Set(snakeBody)
-    return set.size !== snakeBody.length
+    const head = snakeBody[0]
+    return snakeBody.slice(1).some(segment => head.equals(segment))
 }
 
 // CHECK SNAKE HIT BOUNDARY

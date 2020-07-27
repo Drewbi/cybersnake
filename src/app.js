@@ -7,7 +7,7 @@ import { bindInput } from './helper/input'
 import config from './config'
 
 const world = init(config);
-bindInput(world)
+bindInput()
 initState()
 setInterval(gameStateChanger, 1000)
 animate(world)();

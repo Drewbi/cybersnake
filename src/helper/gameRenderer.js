@@ -31,6 +31,7 @@ const renderGame = (snake, target, state, vertices) => {
   snake.children[0].geometry.verticesNeedUpdate = true;
   //snake.children[1] is the snake eyes
   snake.children[1].position.set(newPos[0],newPos[1],newPos[2]) 
+  snake.children[1].lookAt(targetPos)
   needsUpdate = false
 }
 
