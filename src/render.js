@@ -1,5 +1,5 @@
-import { renderGame } from "./helper/gameRenderer"
-import { state } from './helper/gameLogic'
+import { renderGame } from "./game/gameRenderer"
+import { state } from './game/gameLogic'
 
 const renderText = (state, gameInfo) => {
   if(state.playing === 0) gameInfo.innerHTML = "Press space to start playing"
@@ -18,7 +18,7 @@ const animate = (world) => () => {
     vertpos,
     snake,
     target,
-    gameInfo
+    gameInfo,
   } = world;
 
   renderText(state, gameInfo)

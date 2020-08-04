@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Disc from './assets/disc.png'
-import { makeSnakeBody, makeSnakeEyes } from './helper/snake'
+import { makeSnakeBody, makeSnakeEyes } from './game/snake'
 import config from './config'
 
 const init = () => {
@@ -133,7 +133,7 @@ const init = () => {
   window.addEventListener( 'resize', onWindowResize, false );
   const gameInfo = document.getElementById( 'gameText' );
 
-  return { renderer, scene, camera, controls, vertpos, snake, target, gameInfo }
+  return { renderer, scene, camera, controls, vertpos, snake, target, gameInfo, particles }
 }
 
 export { init };
