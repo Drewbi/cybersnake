@@ -10,7 +10,7 @@ const setInput = (value) => {
     state.movementVector.applyQuaternion( quaternion );
     state.movementVector.round()
   // Input is up/down
-  } else if(value[1] !== 0) {
+  } else if(value[0] !== 0) {
     const cross = new THREE.Vector3().crossVectors(state.movementVector, state.upVector)
     state.upVector = value[1] === -1 ? state.movementVector.clone().negate() : state.movementVector.clone()
     quaternion.setFromAxisAngle( cross.normalize(), ( -1 * value[1]) * Math.PI / 2 );
