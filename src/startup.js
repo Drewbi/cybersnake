@@ -16,7 +16,8 @@ const init = () => {
   const scene = new THREE.Scene();
 
   const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-  camera.position.z = 250;
+  camera.position.z = 200;
+  camera.position.y = 100;
   
   // ============ Make Cube
 
@@ -121,6 +122,8 @@ const init = () => {
   controls.update();
   controls.enablePan = false;
   controls.enableDamping = true;
+  controls.autoRotate = true;
+  controls.enabled  = false;
 
   // Resize window ----------------------
 
